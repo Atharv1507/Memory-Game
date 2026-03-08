@@ -42,7 +42,7 @@ wss.on('connection', (socket) => {
             if (clients) {
                 clients.forEach((client) => {
                     // readyState 1 means OPEN
-                    if (client !== socket && client.readyState === 1) { 
+                    if (client.readyState === 1) { 
                         client.send(JSON.stringify({
                             type: 'REMOTE_MOVE',
                             payload: message.payload
