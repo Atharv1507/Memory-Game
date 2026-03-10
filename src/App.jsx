@@ -11,7 +11,7 @@ function App() {
   const [revealedIndices, setRevealedIndices] = useState([]);
   const [toJoin, setToJoin] = useState("");
   const [joined, setJoined] = useState(false);
-
+  const [winner,setWinner] =useState(null)
   // Refs for logic that needs to be accessed without stale closures
   const ws = useRef(null);
   const isLockedRef = useRef(false);
@@ -23,7 +23,7 @@ function App() {
   });
 
   function joinRoom() {
-    ws.current = new WebSocket("ws://100.129.167.175:8080");
+    ws.current = new WebSocket("ws://100.129.160.22:8080");
 
     ws.current.onopen = () => {
       const joinMsg = { type: "JOIN", roomId: toJoin };
@@ -40,21 +40,36 @@ function App() {
       } 
       else if (message.type === "REMOTE_MOVE") {
         // ALWAYS call the ref, not the function directly
+        isLockedRef.current=false
         processMoveRef.current(message.payload.index, message.payload.Cnumber);
+      }
+      else if(message.type === 'PAUSE_GAME'){
+        isLockedRef.current=true;
+        console.log(message.payload)
+      }
+      else if(message.type == 'START_GAME'){
+        isLockedRef.current=false
+        console.log("start game now")
       }
     };
   }
 
   function processMove(index, Cnumber) {
-    if(revealedIndices.length==10){
-      console.log("game over")
-    }
-    if (isLockedRef.current) return;
-
+    
+    if (isLockedRef.current || revealedIndices.includes(index)) return;
+    
     // Use the values from the CURRENT render
     if (Cnumber === lastFound + 1) {
       setRevealedIndices((prev) => [...prev, index]);
       setLastFound(Cnumber);
+
+      if(revealedIndices.length==9){
+        setWinner(myPlayerId)
+        console.log('over')
+
+    }
+
+
     } else {
       // MISMATCH LOGIC
       isLockedRef.current = true;
@@ -98,7 +113,19 @@ function App() {
   if (!joined) {
     return <RoomJoin setJoined={setToJoin} />;
   }
-
+  if(winner){
+    return(
+      <div className="winner-screen">
+      <h1>YOU ARE THE</h1>
+      <h4 style={{ color: ((turn && winner === 1) || (!turn && winner === 2)) ? 'green' : 'red' }}>
+        {((turn && winner === 1) || (!turn && winner === 2)) 
+          ? "WINNER !" 
+          : "LOOSER"}
+      </h4>
+          <button className="end-game" onClick={()=>{window.location.reload()}}>Take me back to home</button>
+      </div>
+    )
+  }
   return (
     <div className="app">
       <h1>Card Game</h1>

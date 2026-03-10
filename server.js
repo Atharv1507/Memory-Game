@@ -23,6 +23,7 @@ wss.on('connection', (socket) => {
                 socket.send(JSON.stringify({ type: 'ERROR', message: 'Room is full' }));
                 return;
             }
+            
             rooms[roomId].clients.push(socket);
             socket.playerId=rooms[roomId].clients.length
             socket.roomId = roomId;
@@ -33,22 +34,44 @@ wss.on('connection', (socket) => {
                     playerId:socket.playerId
                 }));
             
+
+            if (rooms[roomId].clients.length==2){
+                console.log("room now full")
+                    rooms[roomId].clients.forEach((client) => {
+                        // readyState 1 means OPEN
+                        if (client.readyState === 1) { 
+                            client.send(JSON.stringify({
+                                type: 'START_GAME',
+                                payload: "ROOM FULL"
+                            }));
+                        }})
+                        console.log(rooms[roomId])
+        }
+
             console.log(`Player joined ${roomId}. Sending common deck.`);
+            console.log(`Players in room are ${rooms[roomId].clients.length}`)
         }
         if (message.type === 'MOVE') {
             const roomId = socket.roomId; 
             const clients = rooms[roomId].clients;
-
+            
             if (clients) {
-                clients.forEach((client) => {
-                    // readyState 1 means OPEN
-                    if (client.readyState === 1) { 
-                        client.send(JSON.stringify({
-                            type: 'REMOTE_MOVE',
-                            payload: message.payload
-                        }));
+                if(clients.length==2){
+                    clients.forEach((client) => {
+                        // readyState 1 means OPEN
+                        if (client.readyState === 1) { 
+                            client.send(JSON.stringify({
+                                type: 'REMOTE_MOVE',
+                                payload: message.payload
+                            }));
+                        }
+                    });
+                }
+                else{
+                        clients.forEach((client)=>{
+                            client.send(JSON.stringify({type:'PAUSE_GAME',payload:'Room not full'}))
+                        })
                     }
-                });
             }
         }
     });
