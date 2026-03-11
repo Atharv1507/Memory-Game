@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 
-const wss = new WebSocketServer({ port: 8080 }); // 'wss' for Web Socket Server
+const wss = new WebSocketServer({ port: process.env.PORT || 8080 }); // 'wss' for Web Socket Server
 const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Pairs for a memory game
 
 const rooms = {}; 
@@ -84,7 +84,7 @@ wss.on('connection', (socket) => {
         if (roomId && rooms[roomId]) {
             rooms[roomId].clients = rooms[roomId].clients.filter(client => client !== socket);
 
-            if (rooms[roomId].length === 0) {
+            if (rooms[roomId].clients.length === 0) {
                 delete rooms[roomId];
             }
         }

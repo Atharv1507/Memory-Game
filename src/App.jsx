@@ -23,7 +23,7 @@ function App() {
   });
 
   function joinRoom() {
-    ws.current = new WebSocket("ws://100.129.160.22:8080");
+    ws.current = new WebSocket("wss://memory-game-production-5d61.up.railway.app:8080");
 
     ws.current.onopen = () => {
       const joinMsg = { type: "JOIN", roomId: toJoin };
