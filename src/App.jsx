@@ -132,11 +132,11 @@ function App() {
       <h4>Room ID: {toJoin}</h4>
       <h2>You are: Player {myPlayerId}</h2>
       
-      <h4 style={{ color: ((turn && myPlayerId === 1) || (!turn && myPlayerId === 2)) ? 'green' : 'red' }}>
+      <h3 style={{ color: ((turn && myPlayerId === 1) || (!turn && myPlayerId === 2)) ? 'green' : 'red' }}>
         {((turn && myPlayerId === 1) || (!turn && myPlayerId === 2)) 
           ? "Your Turn!" 
-          : "Waiting for Opponent..."}
-      </h4>
+          : "Waiting for Opponent..."} 
+      </h3>
 
       <div className="card-grid">
         {shuffledCards.map((value, index) => (
@@ -149,6 +149,7 @@ function App() {
           />
         ))}
       </div>
+      <footer>Have fun !</footer>
     </div>
   );
 }

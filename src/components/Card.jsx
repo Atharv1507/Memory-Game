@@ -8,7 +8,7 @@ function Card({ Cnumber, index, isRevealed, onCardClick }) {
       onClick={() => onCardClick(index, Cnumber)}
     >
       {!isRevealed ? (
-        <img className="cardFront" src={cardImg} alt="back" />
+        null
       ) : (
         <p>{Cnumber}</p>
       )}
